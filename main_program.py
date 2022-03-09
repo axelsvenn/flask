@@ -1,46 +1,36 @@
-from flask import Flask, url_for, request
+import json
+
+from flask import Flask, render_template, redirect
+
+from loginform import LoginForm
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 
-@app.route('/load_photo', methods=['POST', 'GET'])
-def load_photo():
-    if request.method == 'GET':
-        return f'''<!doctype html>
-                            <html lang="en">
-                              <head>
-                                <meta charset="utf-8">
-                                <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-                                <link rel="stylesheet"
-                                href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
-                                integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
-                                crossorigin="anonymous">
-                                <link rel="stylesheet" type="text/css" href="{url_for('static', filename='css/style.css')}"/>
-                                <title>Отбор астронавтов</title>
-                              </head>
-                              <body>
-                                <h1 align="center">Загрузка фотографии</h1>
-                                <h2 align="center">для участия в миссии</h2>
-                                <div>
-                                    <form class="login_form" method="post">
-                                        <div class="form-group">
-                                            <label for="photo">Приложите фотографию</label><br>
-                                            <input type="file" class="form-control-file" id="photo" name="file">
-                                        </div>
-                                        <br>
-                                        <img src="{url_for('static', filename='img/photo.png')}"
-                                        alt="здесь должна была быть картинка, но не нашлась">
-                                        <button type="submit" class="btn btn-primary">Отправить</button>
-                                    </form>
-                                </div>
-                              </body>
-                            </html>'''
+@app.route('/')
+@app.route('/index')
+def index():
+    param = {}
+    param['username'] = "Ученик Яндекс.Лицея"
+    param['title'] = 'Домашняя страница'
+    return render_template('index.html', **param)
 
-    elif request.method == 'POST':
-        with open("static/img/photo.png", 'wb') as fd:
-            f = request.files["file"]
-            fd.write(f.read())
-        return "Форма отправлена"
+
+@app.route('/news')
+def news():
+    with open("news.json", "rt", encoding="utf8") as f:
+        news_list = json.loads(f.read())
+    print(news_list)
+    return render_template('news.html', news=news_list)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        return redirect('/success')
+    return render_template('login.html', title='Авторизация', form=form)
 
 
 if __name__ == '__main__':
