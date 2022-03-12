@@ -1,7 +1,6 @@
 import json
-
+from data import db_session
 from flask import Flask, render_template, redirect
-
 from loginform import LoginForm
 
 app = Flask(__name__)
@@ -33,5 +32,10 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
+def main():
+    db_session.global_init("db/blogs.db")
+    app.run()
+
+
 if __name__ == '__main__':
-    app.run(port=8080, host='127.0.0.1')
+    main()
