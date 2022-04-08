@@ -2,7 +2,7 @@ import json
 from data import db_session
 from flask import Flask, render_template, redirect
 
-from data.news import News
+from data.jobs import Jobs
 from forms.user import RegisterForm
 from loginform import LoginForm
 from data.users import User
@@ -14,7 +14,7 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 @app.route('/')
 def index():
     db_sess = db_session.create_session()
-    news = db_sess.query(News).filter(News.is_private != True)
+    news = db_sess.query(Jobs).filter(Jobs.is_private != True)
     return render_template("index.html", news=news)
 
 
@@ -60,13 +60,20 @@ def reqister():
 
 
 def main():
-    db_session.global_init("db/blogs.db")
-    # db_sess = db_session.create_session()
-    # news = News(title="Вторая новость", content="Привет блог! ДА",
-    #             user_id=1, is_private=True)
-    # db_sess.add(news)
-    # db_sess.commit()
-    app.run()
+    db_session.global_init("db/mars_explorer.db")
+    db_sess = db_session.create_session()
+    user = User()
+    user.surname = "Walter"
+    user.name = "White"
+    user.age = 52
+    user.position = "cook"
+    user.speciality = "cook our food"
+    user.address = "module_kitchen"
+    user.email = "savewalterwhite@mars.org"
+    user.hashed_password = "heinsenberg"
+    db_sess.add(user)
+    db_sess.commit()
+    # app.run()
 
 
 if __name__ == '__main__':
